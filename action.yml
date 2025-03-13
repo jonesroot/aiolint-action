@@ -1,0 +1,42 @@
+name: "AIOLint - All-in-One Linter"
+
+description: "Automatic linting for multiple languages, detects, analyzes and fixes code errors."
+
+author: "Lucifer"
+
+inputs:
+  auto-fix:
+    description: "Enable automatic repair (true/false)"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        pip install pylint flake8 black isort
+        npm install -g eslint prettier
+        go install golang.org/x/tools/cmd/goimports@latest
+        cargo install rustfmt
+        composer global require squizlabs/php_codesniffer
+        sudo apt install cppcheck shellcheck
+
+    - name: Run AIOLint
+      shell: bash
+      run: python3 scripts/lint_checker.py
+
+    - name: Automatic Repair (Optional)
+      if: ${{ inputs.auto-fix == 'true' }}
+      shell: bash
+      run: python3 scripts/fix_code.py
+
+branding:
+  icon: "check-circle"
+  color: "blue"
