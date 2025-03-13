@@ -20,11 +20,12 @@ jobs:
         run: |
           pip3 install pylint flake8 black isort
           npm install -g eslint prettier
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
           composer global require squizlabs/php_codesniffer
           sudo apt install cppcheck shellcheck
-          wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
-          chmod +x /bin/hadolint
+          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+          export PATH=$PATH:$(go env GOPATH)/bin:/usr/local/bin
 
       - name: Setup Rust
         run: |
