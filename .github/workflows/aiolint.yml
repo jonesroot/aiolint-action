@@ -7,6 +7,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout kode
         uses: actions/checkout@v4
@@ -18,29 +19,55 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # Install Python dependencies
           pip3 install pylint flake8 black isort
+
+          # Install Node.js dependencies
           npm install -g eslint prettier
+
+          # Install Go dependencies
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+
+          # Install PHP dependencies
           composer global require squizlabs/php_codesniffer friendsofphp/php-cs-fixer
-          sudo apt install cppcheck shellcheck shfmt
+
+          # Install system-wide linters
+          sudo apt-get install -y cppcheck shellcheck shfmt
+
+          # Install Hadolint
           wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
 
+      # Optionally, set up Rust if required by your project
       - name: Setup Rust
         run: |
           rustup update
           rustup component add rustfmt clippy
+        continue-on-error: true  # If you're not using Rust, you can skip this step
 
       - name: Check & Fix Code Formatting
         run: |
+          # Python formatting
           black .
           isort .
+
+          # JavaScript/TypeScript linting and fixing
           eslint . --fix || true
+
+          # Go linting
           golangci-lint run || true
+
+          # PHP linting
           phpcs --standard=PSR12 . || true
+
+          # Rust formatting and linting (if using Rust)
           cargo fmt || true
           cargo clippy || true
+
+          # C/C++ linting
           cppcheck . || true
+
+          # Dockerfile linting
           hadolint Dockerfile || true
 
       - name: Run AIOLint
