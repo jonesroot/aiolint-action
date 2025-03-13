@@ -20,17 +20,28 @@ jobs:
         run: |
           pip3 install pylint flake8 black isort
           npm install -g eslint prettier
-          go install golang.org/x/tools/cmd/goimports@latest
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
           composer global require squizlabs/php_codesniffer
           sudo apt install cppcheck shellcheck
+          wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /bin/hadolint
 
-      - name: Install rustfmt if you don't have it yet
+      - name: Setup Rust
         run: |
-          if ! command -v cargo-fmt &> /dev/null; then
-            cargo install rustfmt
-          else
-            echo "rustfmt is already installed, past the installation .."
-          fi
+          rustup update
+          rustup component add rustfmt clippy
+
+      - name: Check & Fix Code Formatting
+        run: |
+          black .
+          isort .
+          eslint . --fix || true
+          golangci-lint run || true
+          phpcs --standard=PSR12 . || true
+          cargo fmt || true
+          cargo clippy || true
+          cppcheck . || true
+          hadolint Dockerfile || true
 
       - name: Run AIOLint
         run: python3 scripts/lint_checker.py
