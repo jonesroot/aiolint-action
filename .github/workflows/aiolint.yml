@@ -38,12 +38,6 @@ jobs:
           wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
 
-      - name: Setup Rust (Optional)
-        if: needs.rust == 'true'
-        run: |
-          rustup update
-          rustup component add rustfmt clippy
-
       - name: Check & Fix Code Formatting
         run: |
           # Python formatting
