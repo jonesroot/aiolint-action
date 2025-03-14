@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout kode
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -38,12 +38,11 @@ jobs:
           wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
 
-      # Optionally, set up Rust if required by your project
-      - name: Setup Rust
+      - name: Setup Rust (Optional)
+        if: needs.rust == 'true'
         run: |
           rustup update
           rustup component add rustfmt clippy
-        continue-on-error: true  # If you're not using Rust, you can skip this step
 
       - name: Check & Fix Code Formatting
         run: |
