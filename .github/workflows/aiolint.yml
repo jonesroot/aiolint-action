@@ -53,9 +53,6 @@ jobs:
           # PHP linting
           phpcs --standard=PSR12 . || true
 
-          # Rust formatting and linting (if using Rust)
-          cargo fmt || true
-          cargo clippy || true
 
           # C/C++ linting
           cppcheck . || true
